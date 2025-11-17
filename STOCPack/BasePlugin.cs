@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace STOCPack
 {
-    [BepInPlugin("starrie.bbplus.stoc", "Shaldi's Tower of Chaos Pack", "0.0.1")]
+    [BepInPlugin("starrie.bbplus.stoc", "Shaldi's Tower of Chaos Pack", "0.0.2")]
 
     [BepInDependency("mtm101.rulerp.bbplus.baldidevapi")]
 
@@ -18,6 +18,7 @@ namespace STOCPack
     {
         public AssetManager assetMan = new AssetManager();
         private static string npcSubDirectory = "Textures/NPCs";
+        private static string npcAudioSubDirectory = "Audio/NPCs";
         public void Awake()
         {
             Harmony harmony = new Harmony("starrie.bbplus.stoc");
@@ -46,11 +47,23 @@ namespace STOCPack
             .SetPoster(assetMan.Get<Texture2D>("Shaldi_Poster"), "Shaldi", "Do not let him catch you.")
             .Build();
 
+            Stroketon plankton = new NPCBuilder<Stroketon>(Info)
+            .SetName("Stroketon")
+            .SetEnum("Plankton")
+            .SetMinMaxAudioDistance(1, 300)
+            .IgnorePlayerOnSpawn()
+            .AddSpawnableRoomCategories(new RoomCategory[] { RoomCategory.Hall, RoomCategory.Class, RoomCategory.Office, RoomCategory.Faculty })
+            .SetPoster(assetMan.Get<Texture2D>("Stroketon_Poster"), "Stroketon", "Dr. Jr.")
+            .Build();
+
             yield return "Doing some miscellaneous stuff...";
 
             PinkGuy.shaldiSprite = assetMan.Get<Sprite>("ShaldiSprite");
+            plankton.stroketonSprite = assetMan.Get<Sprite>("StroketonSprite");
+            plankton.stroketonDrJr = assetMan.Get<SoundObject>("StroketonDrJr");
 
             assetMan.Add<NPC>("Shaldi", PinkGuy);
+            assetMan.Add<NPC>("Stroketon", plankton);
 
         }
 
@@ -58,7 +71,11 @@ namespace STOCPack
         {
             assetMan.Add<Texture2D>("Shaldi", AssetLoader.TextureFromMod(this, npcSubDirectory, "Shaldi/Shaldi.png"));
             assetMan.Add<Texture2D>("Shaldi_Poster", AssetLoader.TextureFromMod(this, npcSubDirectory, "Shaldi/Shaldi_Poster.png"));
-            assetMan.Add<Sprite>("ShaldiSprite", AssetLoader.SpriteFromTexture2D(assetMan.Get<Texture2D>("Shaldi"), 50));
+            assetMan.Add<Sprite>("ShaldiSprite", AssetLoader.SpriteFromTexture2D(assetMan.Get<Texture2D>("Shaldi"), 30));
+            assetMan.Add<Texture2D>("Stroketon", AssetLoader.TextureFromMod(this, npcSubDirectory, "Stroketon/Stroketon.png"));
+            assetMan.Add<Texture2D>("Stroketon_Poster", AssetLoader.TextureFromMod(this, npcSubDirectory, "Stroketon/Stroketon_Poster.png"));
+            assetMan.Add<Sprite>("StroketonSprite", AssetLoader.SpriteFromTexture2D(assetMan.Get<Texture2D>("Stroketon"), 50));
+            assetMan.Add<SoundObject>("StroketonDrJr", ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromMod(this, npcAudioSubDirectory, "Stroketon/STRO_DrJr.wav"), "Dr. Jr.", SoundType.Music, Color.green));
         }
 
         private void AddObjects(string floor, int floorNumber, SceneObject floorObject)
@@ -71,6 +88,12 @@ namespace STOCPack
                     weight = floorNumber < 2 ? 100 * floorNumber : 250
                 }
                 );
+                floorObject.potentialNPCs.Add(new WeightedNPC()
+                {
+                    selection = assetMan.Get<NPC>("Stroketon"),
+                    weight = floorNumber < 2 ? 150 * floorNumber : 475
+                }
+                );
             }
             else if (floor == "END")
             {
@@ -78,6 +101,12 @@ namespace STOCPack
                 {
                     selection = assetMan.Get<NPC>("Shaldi"),
                     weight = 250
+                }
+                );
+                floorObject.potentialNPCs.Add(new WeightedNPC()
+                {
+                    selection = assetMan.Get<NPC>("Stroketon"),
+                    weight = 475
                 }
                 );
             }
