@@ -56,7 +56,7 @@ namespace STOCPack
 
         private void GetAssets()
         {
-            assetMan.Add<Texture2D>("Shaldi", AssetLoader.TextureFromMod(this, npcSubDirectory, "Shaldi.png"));
+            assetMan.Add<Texture2D>("Shaldi", AssetLoader.TextureFromMod(this, npcSubDirectory, "/Shaldi/Shaldi.png"));
             assetMan.Add<Texture2D>("Shaldi_Poster", AssetLoader.TextureFromMod(this, npcSubDirectory, "Shaldi_Poster.png"));
             assetMan.Add<Sprite>("ShaldiSprite", AssetLoader.SpriteFromTexture2D(assetMan.Get<Texture2D>("Shaldi"), 50));
         }
